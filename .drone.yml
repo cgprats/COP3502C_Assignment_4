@@ -1,0 +1,12 @@
+kind: pipeline
+name: gcc
+type: docker
+
+steps:
+        - name: gcc-build
+          image: gcc
+          commands:
+                  - make
+                  - out/as3.out
+                  - out/integer-sorts-template.out
+                  - out/monster-sorts-template.out
