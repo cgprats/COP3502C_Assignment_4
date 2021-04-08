@@ -22,10 +22,15 @@ typedef struct tree_name_node_struct tree_name_node;
 // Function Prototypes
 void remove_crlf(char *s); //Remove Carriage Return
 int get_next_nonblank_line(FILE *ifp, char *buf, int max_length);
+void initialize_tree(FILE *ifp, tree_name_node *tree);
 
 // Constructor Prototypes
+item_node *create_item_node(char name[], int count); //Constructor for Item Node
+tree_name_node *create_tree_name_node(char treeName[], item_node *theTree); //Constructor for Tree Name Node
 
 // Destructor Prototypes
+void dispose_item_node(item_node *del_item_node); //Destructor for Item Node
+void dispose_tree_name_node(tree_name_node *del_tree_name_node); //Destructor for Tree Name Node
 
 // The Main Function
 int main() {
@@ -33,10 +38,15 @@ int main() {
 	FILE *ifp = fopen("cop3502-as4-input.txt", "r");
 	FILE *ofp = fopen("cop3502-as4-output-prats-christopher.txt", "w");
 
+	//Create and Initialize the Tree
+	tree_name_node *tree = malloc(sizeof(tree_name_node));
+	initialize_tree(ifp, tree);
+
+	//Initialize the Tree
+
 	//Close the Input and Output Files Prior to Exit
 	fclose(ifp);
 	fclose(ofp);
-
 
 	return 0;
 }
@@ -106,4 +116,73 @@ int get_next_nonblank_line(FILE *ifp, char *buf, int max_length) {
 	else {
 		return 0;
 	}
+}
+
+// This Function will Initialize the Tree from a File
+void initialize_tree(FILE *ifp, tree_name_node *tree) {
+	//Get the Item Counts from the File
+	int num_tree_nodes, num_item_nodes, num_commands;
+	char buf[64];
+	get_next_nonblank_line(ifp, buf, 63);
+	sscanf(buf, "%d %d %d", &num_tree_nodes, &num_item_nodes, &num_commands);
+
+	//Create the Tree Nodes
+	for (int i = 0; i < num_tree_nodes; i++) {
+		//Read the Node Name
+		get_next_nonblank_line(ifp, buf, 63);
+
+		//If the Item is the Head of the Tree
+		if (i == 0) {
+			strcpy(tree->treeName, buf);
+		}
+
+		else {
+		}
+	}
+
+	//Create the Item Nodes
+	for (int i = 0; i < num_item_nodes; i++) {
+	}
+}
+
+/*
+ * This section includes the functions for constructing the various
+ * objects used in this program
+ */
+
+// This Function will Create and Return a New Item Node
+item_node *create_item_node(char name[], int count) {
+	item_node *new_item_node = malloc(sizeof(item_node));
+	strcpy(new_item_node->name, name);
+	new_item_node->count = count;
+	new_item_node->left = NULL;
+	new_item_node->right = NULL;
+
+	//Return the Created Item Node
+	return new_item_node;
+}
+
+// This Function will Create and Return a New Tree Name Node
+tree_name_node *create_tree_name_node(char treeName[], item_node *theTree) {
+	tree_name_node *new_tree_name_node = malloc(sizeof(tree_name_node));
+	strcpy(new_tree_name_node->treeName, treeName);
+	new_tree_name_node->left = NULL;
+	new_tree_name_node->right = NULL;
+	new_tree_name_node->theTree = theTree;
+
+	//Return the Created Tree Name Node
+	return new_tree_name_node;
+}
+
+/*
+ * This section includes the functions for destroying the various
+ * objects used in the program
+ */
+
+// This Function will Destroy a Item Node that was Constructed
+void dispose_item_node(item_node *del_item_node) {
+}
+
+// This Function will Destroy a Tree Name Node that was Constructed
+void dispose_tree_name_node(tree_name_node *del_tree_name_node) {
 }
