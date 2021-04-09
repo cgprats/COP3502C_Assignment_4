@@ -24,6 +24,8 @@ void remove_crlf(char *s); //Remove Carriage Return
 int get_next_nonblank_line(FILE *ifp, char *buf, int max_length); //Get the Next Nonblank Line from a File
 void initialize_tree(FILE *ifp, tree_name_node *tree); //Initialize the Tree from an Input File
 void add_tree_node_child(tree_name_node *parent, tree_name_node *child); //Add a Child to a Tree Node Tree
+void add_item_node_child(tree_name_node *tree, item_node *child, char parent_tree[]); //Add a Child to a Item Node Tree
+tree_name_node *search_for_name_node(tree_name_node *tree, char treeName[]); //Search for a Tree Name Node
 
 // Constructor Prototypes
 item_node *create_item_node(char name[], int count); //Constructor for Item Node
@@ -129,7 +131,7 @@ void initialize_tree(FILE *ifp, tree_name_node *tree) {
 	sscanf(buf, "%d %d %d", &num_tree_nodes, &num_item_nodes, &num_commands);
 
 	//Create the Tree Nodes
-	tree_name_node *tempNode;
+	tree_name_node *tempTreeNode;
 	for (int i = 0; i < num_tree_nodes; i++) {
 		//Read the Node Name
 		get_next_nonblank_line(ifp, buf, 63);
@@ -141,13 +143,27 @@ void initialize_tree(FILE *ifp, tree_name_node *tree) {
 		}
 
 		else {
-			tempNode = create_tree_name_node(buf);
-			add_tree_node_child(tree, tempNode);
+			tempTreeNode = create_tree_name_node(buf);
+			add_tree_node_child(tree, tempTreeNode);
 		}
 	}
 
 	//Create the Item Nodes
+	item_node *tempItemNode;
+	char parent_tree[64];
+	char name[32];
+	int count;
 	for (int i = 0; i < num_item_nodes; i++) {
+		//Read the Node Data
+		get_next_nonblank_line(ifp, buf, 63);
+		remove_crlf(buf);
+		sscanf(buf, "%s %s %d", parent_tree, name, &count);
+
+		//Set the Node to be Added
+		tempItemNode = create_item_node(name, count);
+
+		//Add the Node
+		add_item_node_child(tree, tempItemNode, parent_tree);
 	}
 }
 
@@ -178,6 +194,40 @@ void add_tree_node_child(tree_name_node *parent, tree_name_node *child) {
 			add_tree_node_child(parent->left, child);
 		}
 	}
+}
+
+// This Function Adds a New Child Node to an Item Node Tree
+void add_item_node_child(tree_name_node *tree, item_node *child, char parent_tree[]) {
+}
+
+// This Function Finds and Returns a Tree Name Node
+tree_name_node *search_for_name_node(tree_name_node *tree, char treeName[]) {
+	//Set the Default Value to foundNode to Null if a Node is Not Found
+	tree_name_node *foundNode = NULL;
+
+	//Set the Starting Node to the Top of the Tree
+	tree_name_node *currentNode = tree;
+
+	//Search for the Node
+	do {
+		//If the Node Matches, set the Found Node
+		if (!strcmp(currentNode->treeName, treeName)) {
+			foundNode = currentNode;
+		}
+
+		//If the Current Node is Larger than the Node We're Looking For, Check the Node to the Left
+		else if (strcmp(currentNode->treeName, treeName) > 0) {
+			currentNode = currentNode->left;
+		}
+
+		//If the Current Node is Smaller than the Node We're Looking For, Check the Node to the Right
+		else if (strcmp(currentNode->treeName, treeName) < 0) {
+			currentNode = currentNode->right;
+		}
+	} while (strcmp(currentNode->treeName, treeName));
+
+	//Return the Found Node
+	return foundNode;
 }
 
 /*
