@@ -21,12 +21,13 @@ typedef struct tree_name_node_struct tree_name_node;
 
 // Function Prototypes
 void remove_crlf(char *s); //Remove Carriage Return
-int get_next_nonblank_line(FILE *ifp, char *buf, int max_length);
-void initialize_tree(FILE *ifp, tree_name_node *tree);
+int get_next_nonblank_line(FILE *ifp, char *buf, int max_length); //Get the Next Nonblank Line from a File
+void initialize_tree(FILE *ifp, tree_name_node *tree); //Initialize the Tree from an Input File
+void add_tree_node_child(tree_name_node *parent, tree_name_node *child); //Add a Child to a Tree Node Tree
 
 // Constructor Prototypes
 item_node *create_item_node(char name[], int count); //Constructor for Item Node
-tree_name_node *create_tree_name_node(char treeName[], item_node *theTree); //Constructor for Tree Name Node
+tree_name_node *create_tree_name_node(char treeName[]); //Constructor for Tree Name Node
 
 // Destructor Prototypes
 void dispose_item_node(item_node *del_item_node); //Destructor for Item Node
@@ -124,12 +125,15 @@ void initialize_tree(FILE *ifp, tree_name_node *tree) {
 	int num_tree_nodes, num_item_nodes, num_commands;
 	char buf[64];
 	get_next_nonblank_line(ifp, buf, 63);
+	remove_crlf(buf);
 	sscanf(buf, "%d %d %d", &num_tree_nodes, &num_item_nodes, &num_commands);
 
 	//Create the Tree Nodes
+	tree_name_node *tempNode;
 	for (int i = 0; i < num_tree_nodes; i++) {
 		//Read the Node Name
 		get_next_nonblank_line(ifp, buf, 63);
+		remove_crlf(buf);
 
 		//If the Item is the Head of the Tree
 		if (i == 0) {
@@ -137,11 +141,42 @@ void initialize_tree(FILE *ifp, tree_name_node *tree) {
 		}
 
 		else {
+			tempNode = create_tree_name_node(buf);
+			add_tree_node_child(tree, tempNode);
 		}
 	}
 
 	//Create the Item Nodes
 	for (int i = 0; i < num_item_nodes; i++) {
+	}
+}
+
+// This Function Adds a New Child Node to a Tree Node Tree
+void add_tree_node_child(tree_name_node *parent, tree_name_node *child) {
+	//If Child is Greater than the Parent, Add it to the Right
+	if (strcmp(child->treeName, parent->treeName) > 0) {
+		//Add it to the Right if it is Available
+		if (parent->right == NULL) {
+			parent->right = child;
+		}
+
+		//Otherwise Attempt the Process with the Parent's Right Node
+		else {
+			add_tree_node_child(parent->right, child);
+		}
+	}
+
+	//Otherwise, Add it to the Left
+	else {
+		//Add it to the Left if it is Available
+		if (parent->left == NULL) {
+			parent->left = child;
+		}
+
+		//Otherwise Attempt the Process with the Parent's Left Node
+		else {
+			add_tree_node_child(parent->left, child);
+		}
 	}
 }
 
@@ -163,12 +198,12 @@ item_node *create_item_node(char name[], int count) {
 }
 
 // This Function will Create and Return a New Tree Name Node
-tree_name_node *create_tree_name_node(char treeName[], item_node *theTree) {
+tree_name_node *create_tree_name_node(char treeName[]) {
 	tree_name_node *new_tree_name_node = malloc(sizeof(tree_name_node));
 	strcpy(new_tree_name_node->treeName, treeName);
 	new_tree_name_node->left = NULL;
 	new_tree_name_node->right = NULL;
-	new_tree_name_node->theTree = theTree;
+	new_tree_name_node->theTree = NULL;
 
 	//Return the Created Tree Name Node
 	return new_tree_name_node;
