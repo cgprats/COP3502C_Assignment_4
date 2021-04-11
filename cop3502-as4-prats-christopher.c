@@ -29,6 +29,9 @@ void add_item_node_child_to_tree(tree_name_node *tree, item_node *child, char pa
 tree_name_node *search_for_name_node(tree_name_node *tree, char treeName[]); //Search for a Tree Name Node
 item_node *search_in_name_node(tree_name_node *tree, char treeName[], char itemNodeName[]); //Search for an Item Node
 void traverse_in_order(tree_name_node *tree); //Print the Tree in Order
+void print_tree_name_nodes(tree_name_node *tree); //Print Tree Name Nodes
+void print_item_nodes(item_node *item); //Print Item Nodes
+void print_all_item_nodes(tree_name_node *tree); //Print All Item Nodes in a Tree
 
 // Constructor Prototypes
 item_node *create_item_node(char name[], int count); //Constructor for Item Node
@@ -48,7 +51,8 @@ int main() {
 	tree_name_node *tree = malloc(sizeof(tree_name_node));
 	initialize_tree(ifp, tree);
 
-	//Initialize the Tree
+	//Print the Tree
+	traverse_in_order(tree);
 
 	//Close the Input and Output Files Prior to Exit
 	fclose(ifp);
@@ -315,8 +319,63 @@ item_node *search_in_name_node(tree_name_node *tree, char treeName[], char itemN
 	return foundNode;
 }
 
-//This Function Prints the Tree in Order
+// This Function Prints the Tree in Order
 void traverse_in_order(tree_name_node *tree) {
+	//Print the Tree Name Nodes
+	print_tree_name_nodes(tree);
+	printf("\n");
+
+	//Print All Item Nodes
+	print_all_item_nodes(tree);
+}
+
+//This Function Prints the Tree Name Nodes
+void print_tree_name_nodes(tree_name_node *tree) {
+	//Only Attempt to Print if the Tree Node Exists
+	if (tree != NULL) {
+		//Recursively Call the Function on the Left Node
+		print_tree_name_nodes(tree->left);
+		
+		//Print the Current Tree Node
+		printf("%s ", tree->treeName);
+		
+		//Recursively Call the Function on the Right Node
+		print_tree_name_nodes(tree->right);
+	}
+}
+
+// This Function Prints the Item Name Nodes
+void print_item_nodes(item_node *item) {
+	//Only Attempt to Print if the Item Node Exists
+	if (item != NULL) {
+		//Recursively Call the Function on the Left Node
+		print_item_nodes(item->left);
+
+		//Print the Current Item Node
+		printf("%s ", item->name);
+
+		//Recursively Call the Function on the Right Node
+		print_item_nodes(item->right);
+	}
+}
+
+// This Function Prints All Item Nodes in a Tree
+void print_all_item_nodes(tree_name_node *tree) {
+	//Only Attempt to Print if the Tree Exists
+	if (tree != NULL) {
+		//Recursively Call the Function on the Left Node
+		print_all_item_nodes(tree->left);
+
+		//Print the Current Tree Name
+		printf("===%s===\n", tree->treeName);
+
+		//Print All Member Item Nodes
+		print_item_nodes(tree->theTree);
+		printf("\n");
+
+		//Recursively Call the Function on the Right Node
+		print_all_item_nodes(tree->right);
+	}
 }
 
 /*
