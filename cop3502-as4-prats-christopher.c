@@ -28,6 +28,7 @@ void add_item_node_child(item_node *parent, item_node *child); //Add a Child to 
 void add_item_node_child_to_tree(tree_name_node *tree, item_node *child, char parent_tree[]); //Add a Child to a Item Node Tree with the Tree Node Tree
 tree_name_node *search_for_name_node(tree_name_node *tree, char treeName[]); //Search for a Tree Name Node
 item_node *search_in_name_node(tree_name_node *tree, char treeName[], char itemNodeName[]); //Search for an Item Node
+void traverse_in_order(tree_name_node *tree); //Print the Tree in Order
 
 // Constructor Prototypes
 item_node *create_item_node(char name[], int count); //Constructor for Item Node
@@ -312,6 +313,10 @@ item_node *search_in_name_node(tree_name_node *tree, char treeName[], char itemN
 
 	//Return the Found Node
 	return foundNode;
+}
+
+//This Function Prints the Tree in Order
+void traverse_in_order(tree_name_node *tree) {
 }
 
 /*
