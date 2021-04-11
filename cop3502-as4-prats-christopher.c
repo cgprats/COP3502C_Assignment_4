@@ -24,7 +24,8 @@ void remove_crlf(char *s); //Remove Carriage Return
 int get_next_nonblank_line(FILE *ifp, char *buf, int max_length); //Get the Next Nonblank Line from a File
 void initialize_tree(FILE *ifp, tree_name_node *tree); //Initialize the Tree from an Input File
 void add_tree_node_child(tree_name_node *parent, tree_name_node *child); //Add a Child to a Tree Node Tree
-void add_item_node_child(tree_name_node *tree, item_node *child, char parent_tree[]); //Add a Child to a Item Node Tree
+void add_item_node_child(item_node *parent, item_node *child);
+void add_item_node_child_to_tree(tree_name_node *tree, item_node *child, char parent_tree[]); //Add a Child to a Item Node Tree
 tree_name_node *search_for_name_node(tree_name_node *tree, char treeName[]); //Search for a Tree Name Node
 
 // Constructor Prototypes
@@ -163,7 +164,7 @@ void initialize_tree(FILE *ifp, tree_name_node *tree) {
 		tempItemNode = create_item_node(name, count);
 
 		//Add the Node
-		add_item_node_child(tree, tempItemNode, parent_tree);
+		add_item_node_child_to_tree(tree, tempItemNode, parent_tree);
 	}
 }
 
@@ -197,7 +198,53 @@ void add_tree_node_child(tree_name_node *parent, tree_name_node *child) {
 }
 
 // This Function Adds a New Child Node to an Item Node Tree
-void add_item_node_child(tree_name_node *tree, item_node *child, char parent_tree[]) {
+void add_item_node_child(item_node *parent, item_node *child) {
+	//If Child is Greater than the Parent, Add it to the Right
+	if (strcmp(child->name, parent->name) > 0) {
+		//Add it to the Right if it is Available
+		if (parent->right == NULL) {
+			parent->right = child;
+		}
+
+		//Otherwise Attempt the Process with the Parent's Right Node
+		else {
+			add_item_node_child(parent->right, child);
+		}
+	}
+
+	//Otherwise, Add it to the Left
+	else {
+		//Add it to the Left if it is Available
+		if (parent->left == NULL) {
+			parent->left = child;
+		}
+
+		//Otherwise Attempt the Process with the Parent's Left Node
+		else {
+			add_item_node_child(parent->left, child);
+		}
+	}
+}
+
+// This Function Adds a New Child Node to an Item Node Tree from a Tree Node Tree
+void add_item_node_child_to_tree(tree_name_node *tree, item_node *child, char parent_tree[]) {
+	//Find the Tree Node to Add the Child to
+	tree = search_for_name_node(tree, parent_tree);
+
+	//Exit the Function if the Parent Tree Does Not Exist
+	if (tree == NULL) {
+		return;
+	}
+
+	//Add the Child as a Head if the Tree Lacks an Item Node Tree
+	else if (tree->theTree == NULL) {
+		tree->theTree = child;
+	}
+
+	//Add the Child as a Child of the Item Node Tree
+	else {
+		add_item_node_child(tree->theTree, child);
+	}
 }
 
 // This Function Finds and Returns a Tree Name Node
