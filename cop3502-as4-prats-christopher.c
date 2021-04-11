@@ -24,9 +24,10 @@ void remove_crlf(char *s); //Remove Carriage Return
 int get_next_nonblank_line(FILE *ifp, char *buf, int max_length); //Get the Next Nonblank Line from a File
 void initialize_tree(FILE *ifp, tree_name_node *tree); //Initialize the Tree from an Input File
 void add_tree_node_child(tree_name_node *parent, tree_name_node *child); //Add a Child to a Tree Node Tree
-void add_item_node_child(item_node *parent, item_node *child);
-void add_item_node_child_to_tree(tree_name_node *tree, item_node *child, char parent_tree[]); //Add a Child to a Item Node Tree
+void add_item_node_child(item_node *parent, item_node *child); //Add a Child to a Item Node Tree without the Tree Node Tree
+void add_item_node_child_to_tree(tree_name_node *tree, item_node *child, char parent_tree[]); //Add a Child to a Item Node Tree with the Tree Node Tree
 tree_name_node *search_for_name_node(tree_name_node *tree, char treeName[]); //Search for a Tree Name Node
+item_node *search_in_name_node(tree_name_node *tree, char treeName[], char itemNodeName[]); //Search for an Item Node
 
 // Constructor Prototypes
 item_node *create_item_node(char name[], int count); //Constructor for Item Node
@@ -249,7 +250,7 @@ void add_item_node_child_to_tree(tree_name_node *tree, item_node *child, char pa
 
 // This Function Finds and Returns a Tree Name Node
 tree_name_node *search_for_name_node(tree_name_node *tree, char treeName[]) {
-	//Set the Default Value to foundNode to Null if a Node is Not Found
+	//Set the Default Value of foundNode to Null if a Node is Not Found
 	tree_name_node *foundNode = NULL;
 
 	//Set the Starting Node to the Top of the Tree
@@ -271,7 +272,43 @@ tree_name_node *search_for_name_node(tree_name_node *tree, char treeName[]) {
 		else if (strcmp(currentNode->treeName, treeName) < 0) {
 			currentNode = currentNode->right;
 		}
-	} while (strcmp(currentNode->treeName, treeName));
+	} while (strcmp(currentNode->treeName, treeName) && currentNode != NULL);
+
+	//Return the Found Node
+	return foundNode;
+}
+
+// This Function Finds and Returns an Item Node
+item_node *search_in_name_node(tree_name_node *tree, char treeName[], char itemNodeName[]) {
+	//Set the Default Value of foundNode to Null if a Node is Not Found
+	item_node *foundNode = NULL;
+
+	//Find the Parent Tree Name Node
+	tree = search_for_name_node(tree, treeName);
+
+	//Start the Search if the Parent Tree Name Node Exists
+	if (tree != NULL) {
+		//Set the Starting Node to the Head of the Item Node Tree
+		item_node *currentNode = tree->theTree;
+
+		//Search for the Node
+		do {
+			//If the Node Matches, set the Found Node
+			if (!strcmp(currentNode->name, itemNodeName)) {
+				foundNode = currentNode;
+			}
+
+			//If the Current Node is Larger than the Node We're Looking For, Check the Node to the Left
+			else if (strcmp(currentNode->name, itemNodeName) > 0) {
+				currentNode = currentNode->left;
+			}
+
+			//If the Current Node is Smaller than the Node We're Lookdng For, Check the Node to the Right
+			else if (strcmp(currentNode->name, itemNodeName) < 0) {
+				currentNode = currentNode->right;
+			}
+		} while (strcmp(currentNode->name, itemNodeName) && currentNode != NULL);
+	}
 
 	//Return the Found Node
 	return foundNode;
