@@ -22,7 +22,7 @@ typedef struct tree_name_node_struct tree_name_node;
 // Function Prototypes
 void remove_crlf(char *s); //Remove Carriage Return
 int get_next_nonblank_line(FILE *ifp, char *buf, int max_length); //Get the Next Nonblank Line from a File
-void initialize_tree(FILE *ifp, tree_name_node *tree); //Initialize the Tree from an Input File
+void initialize_tree(FILE *ifp, tree_name_node *tree, int *num_commands); //Initialize the Tree from an Input File
 void add_tree_node_child(tree_name_node *parent, tree_name_node *child); //Add a Child to a Tree Node Tree
 void add_item_node_child(item_node *parent, item_node *child); //Add a Child to a Item Node Tree without the Tree Node Tree
 void add_item_node_child_to_tree(tree_name_node *tree, item_node *child, char parent_tree[]); //Add a Child to a Item Node Tree with the Tree Node Tree
@@ -32,6 +32,7 @@ void traverse_in_order(FILE *ofp, tree_name_node *tree); //Print the Tree in Ord
 void print_tree_name_nodes(FILE *ofp, tree_name_node *tree); //Print Tree Name Nodes
 void print_item_nodes(FILE *ofp, item_node *item); //Print Item Nodes
 void print_all_item_nodes(FILE *ofp, tree_name_node *tree); //Print All Item Nodes in a Tree
+void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_commands); //Execute Commands from a File
 
 // Constructor Prototypes
 item_node *create_item_node(char name[], int count); //Constructor for Item Node
@@ -49,10 +50,14 @@ int main() {
 
 	//Create and Initialize the Tree
 	tree_name_node *tree = malloc(sizeof(tree_name_node));
-	initialize_tree(ifp, tree);
+	int num_commands;
+	initialize_tree(ifp, tree, &num_commands);
 
 	//Print the Tree
 	traverse_in_order(ofp, tree);
+
+	//Execute Commands
+	execute_commands(ifp, ofp, tree, num_commands);
 
 	//Close the Input and Output Files Prior to Exit
 	fclose(ifp);
@@ -129,13 +134,13 @@ int get_next_nonblank_line(FILE *ifp, char *buf, int max_length) {
 }
 
 // This Function will Initialize the Tree from a File
-void initialize_tree(FILE *ifp, tree_name_node *tree) {
+void initialize_tree(FILE *ifp, tree_name_node *tree, int *num_commands) {
 	//Get the Item Counts from the File
-	int num_tree_nodes, num_item_nodes, num_commands;
+	int num_tree_nodes, num_item_nodes;
 	char buf[64];
 	get_next_nonblank_line(ifp, buf, 63);
 	remove_crlf(buf);
-	sscanf(buf, "%d %d %d", &num_tree_nodes, &num_item_nodes, &num_commands);
+	sscanf(buf, "%d %d %d", &num_tree_nodes, &num_item_nodes, num_commands);
 
 	//Create the Tree Nodes
 	tree_name_node *tempTreeNode;
@@ -382,6 +387,46 @@ void print_all_item_nodes(FILE *ofp, tree_name_node *tree) {
 
 		//Recursively Call the Function on the Right Node
 		print_all_item_nodes(ofp, tree->right);
+	}
+}
+
+// This Function Executes Commands from a File
+void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_commands) {
+	//Create Initial Variables
+	char buf[64], command[64], tree_name[32], item_name[32];
+	
+	//Run the Specified Number of Commands
+	for (int i = 0; i < num_commands; i++) {
+		//Read the Command
+		get_next_nonblank_line(ifp, buf, 63);
+		remove_crlf(buf);
+
+		//Read Into Variables
+		sscanf(buf, "%s %s %s", command, tree_name, item_name);
+
+		//Perform Search
+		if (!strcmp(command, "search")) {
+		}
+
+		//Find Items Before
+		else if (!strcmp(command, "item_before")) {
+		}
+
+		//Balance Tree Height
+		else if (!strcmp(command, "height_balance")) {
+		}
+
+		//Count Items in a Tree Node
+		else if (!strcmp(command, "count")) {
+		}
+
+		//Delete Item
+		else if (!strcmp(command, "delete")) {
+		}
+
+		//Delete Tree
+		else if (!strcmp(command, "delete_tree")) {
+		}
 	}
 }
 
