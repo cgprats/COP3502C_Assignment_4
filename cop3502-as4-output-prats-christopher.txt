@@ -19,4 +19,19 @@ animal: left height 1, right height 3, difference 2, not balanced
 bird: left height -1, right height 2, difference 3, not balanced
 fish: left height 1, right height 1, difference 0, balanced
 flower does not exist
+animal count 142
+fruit count 515
+cat deleted from animal
 30 cat found in animal
+animal count 142
+swordfish deleted from fish
+avocado deleted from fruit
+animal bird fish fruit 
+===animal===
+alligator bear cat cow deer dog horse lion tiger 
+===bird===
+blackbird crow dove flamingo 
+===fish===
+catfish garfish goldfish  
+===fruit===
+apple apricot banana cherry coconut cranberry mango nectarine peach 

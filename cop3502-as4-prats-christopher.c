@@ -35,6 +35,9 @@ void print_all_item_nodes(FILE *ofp, tree_name_node *tree); //Print All Item Nod
 void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_commands); //Execute Commands from a File
 int items_before_item_node(tree_name_node *tree, char treeName[], char itemNodeName[]); //Find Number of Items Before a Node
 int item_side_height(item_node *item); //Find the Height of a Specified Side
+int item_count(item_node *item); //Find the Item Count in a Tree
+item_node *delete_item(item_node *item, char name[]); //Delete an Item from a Tree
+item_node *smallest_item(item_node *item); //Find the Smallest Item in a Tree
 
 // Constructor Prototypes
 item_node *create_item_node(char name[], int count); //Constructor for Item Node
@@ -60,6 +63,7 @@ int main() {
 
 	//Execute Commands
 	execute_commands(ifp, ofp, tree, num_commands);
+	traverse_in_order(ofp, tree);
 
 	//Close the Input and Output Files Prior to Exit
 	fclose(ifp);
@@ -350,10 +354,10 @@ void print_tree_name_nodes(FILE *ofp, tree_name_node *tree) {
 	if (tree != NULL) {
 		//Recursively Call the Function on the Left Node
 		print_tree_name_nodes(ofp, tree->left);
-		
+
 		//Print the Current Tree Node
 		fprintf(ofp, "%s ", tree->treeName);
-		
+
 		//Recursively Call the Function on the Right Node
 		print_tree_name_nodes(ofp, tree->right);
 	}
@@ -397,7 +401,7 @@ void print_all_item_nodes(FILE *ofp, tree_name_node *tree) {
 void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_commands) {
 	//Create Initial Variables
 	char buf[64], command[64], tree_name[32], item_name[32];
-	
+
 	//Run the Specified Number of Commands
 	fprintf(ofp, "=====Processing Commands=====\n");
 	for (int i = 0; i < num_commands; i++) {
@@ -448,11 +452,13 @@ void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_comman
 				int right_height = item_side_height(balance_tree->theTree->right);
 				int difference = right_height - left_height;
 
+				//If There is No Difference, the Tree is Balanced
 				if (!difference) {
 					fprintf(ofp, "%s: left height %d, right height %d, difference %d, balanced\n",
 							tree_name, left_height, right_height, difference);
 				}
 
+				//Otherwise, it is Unbalanced
 				else {
 					fprintf(ofp, "%s: left height %d, right height %d, difference %d, not balanced\n",
 							tree_name, left_height, right_height, difference);
@@ -462,12 +468,34 @@ void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_comman
 
 		//Count Items in a Tree Node
 		else if (!strcmp(command, "count")) {
-			printf("need to implement count\n");
+			//Find Tree to Count In
+			tree_name_node *count_tree = search_for_name_node(tree, tree_name);
+
+			//Perform Count if the Tree Exists
+			if (count_tree != NULL) {
+				fprintf(ofp, "%s count %d\n", tree_name, item_count(count_tree->theTree));
+			}
+
+			//Otherwise, Print a Message
+			else {
+				fprintf(ofp, "%s does not exist\n", tree_name);
+			}
 		}
 
 		//Delete Item
 		else if (!strcmp(command, "delete")) {
-			printf("need to implement delete\n");
+			tree_name_node *delete_from_tree = search_for_name_node(tree, tree_name);
+
+			//Perform Deletion if the Tree Exists
+			if (delete_from_tree != NULL) {
+				delete_item(delete_from_tree->theTree, item_name);
+				fprintf(ofp, "%s deleted from %s\n", item_name, tree_name);
+			}
+
+			//Otherwise, Print a Message
+			else {
+				fprintf(ofp, "%s does not exist\n", tree_name);
+			}
 		}
 
 		//Delete Tree
@@ -535,9 +563,9 @@ int item_side_height(item_node *item) {
 	//Create Initial Variables
 	int height = 0;
 
-	//If Item is NULL, Height is -1
+	//If Item is NULL, Height is Decreased by -1
 	if (item == NULL) {
-		height = -1;
+		height--;
 	}
 
 	//If Item is Not NULL, Increase the Height by 1 and Continue Traveling Down the Tree
@@ -555,9 +583,92 @@ int item_side_height(item_node *item) {
 			height += item_side_height(item->left);
 		}
 	}
-	
+
 	//Return the Calculated Height
 	return height;
+}
+
+// This Function Finds and Returns the Number of Items in a Tree
+int item_count(item_node *item) {
+	//Set the Number of Items to 0, if Item is NULL
+	int num_items = 0;
+
+	if (item != NULL) {
+		//Recursively Call the Function on the Left Node
+		num_items += item_count(item->left);
+
+		//Increment the Number of Items by the Count in the Current Item
+		num_items += item->count;
+
+		//Recursively Call the Function on the Right Node
+		num_items += item_count(item->right);
+	}
+
+	//Return Calculated Number of Items
+	return num_items;
+}
+
+// This Function Deletes an Item from an Item Tree
+item_node *delete_item(item_node *item, char name[]) {
+	//Only Perform Action if the Item is Not Null
+	if (item != NULL) {
+		//Compare Name with the Item's Name
+		int comparison = strcmp(name, item->name);
+
+		//If the Name is Greater than the Item's Name, Set item->right by Recursively Calling the Function
+		if (comparison > 0) {
+			item->right = delete_item(item->right, name);
+		}
+
+		//If the Name is Smaller than the Item's Name, Set item->left by Recursively Calling the Function
+		else if (comparison < 0) {
+			item->left = delete_item(item->left, name);
+		}
+
+		//If the Name Matches, Perform Deletion
+		else {
+			//Create Temporary Variables to Store Deleted Data
+			item_node *temp_item;
+
+			//Set the Return Value if there is No Left Child
+			if (item->left == NULL) {
+				temp_item = item->right;
+				dispose_item_node(item);
+				item = temp_item;
+			}
+
+			//Set the Return Value if there is No Right Child
+			else if (item->right == NULL) {
+				temp_item = item->left;
+				dispose_item_node(item);
+				item = temp_item;
+			}
+
+			//There are Two or No Children Present
+			else {
+				temp_item = smallest_item(item->left);
+				item = temp_item;
+				item->right = delete_item(item->right, temp_item->name);
+			}
+		}
+	}
+
+	//Return the Current Item
+	return item;
+}
+
+// This Function Finds and Returns the Smallest Item in a Tree
+item_node *smallest_item(item_node *item) {
+	//Start from the Passed Item
+	item_node *smallest_item_node = item;
+
+	//Traverse While There is an Item to the Left
+	while (smallest_item_node != NULL && smallest_item_node->left != NULL) {
+		smallest_item_node = smallest_item_node->left;
+	}
+
+	//Return the Smallest Item Node
+	return smallest_item_node;
 }
 
 /*
@@ -596,6 +707,14 @@ tree_name_node *create_tree_name_node(char treeName[]) {
 
 // This Function will Destroy a Item Node that was Constructed
 void dispose_item_node(item_node *del_item_node) {
+	if (del_item_node->left != NULL) {
+		dispose_item_node(del_item_node->left);
+	}
+	if (del_item_node->right != NULL) {
+		dispose_item_node(del_item_node->right);
+	}
+	free(del_item_node);
+	del_item_node = NULL;
 }
 
 // This Function will Destroy a Tree Name Node that was Constructed
