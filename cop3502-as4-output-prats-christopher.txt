@@ -7,3 +7,11 @@ blackbird crow dove flamingo
 catfish garfish goldfish salmon swordfish 
 ===fruit===
 apple apricot avocado banana cherry coconut cranberry mango nectarine peach 
+25 avocado found in fruit
+tilapia not found in fish
+15 cow found in animal
+20 crow found in bird
+cow not found in bird
+30 cat found in animal
+rose not found in flower
+30 cat found in animal

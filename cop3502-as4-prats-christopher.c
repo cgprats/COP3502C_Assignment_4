@@ -406,26 +406,42 @@ void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_comman
 
 		//Perform Search
 		if (!strcmp(command, "search")) {
+			item_node *foundItem = search_in_name_node(tree, tree_name, item_name);
+
+			//If the Item was Found, Print Its Information
+			if (foundItem != NULL) {
+				fprintf(ofp, "%d %s found in %s\n", foundItem->count, foundItem->name, tree_name);
+			}
+
+			//If the Item was Not Found, Print a Message
+			else {
+				fprintf(ofp, "%s not found in %s\n", item_name, tree_name);
+			}
 		}
 
 		//Find Items Before
 		else if (!strcmp(command, "item_before")) {
+			printf("need to implement item_before\n");
 		}
 
 		//Balance Tree Height
 		else if (!strcmp(command, "height_balance")) {
+			printf("need to implement height_balance\n");
 		}
 
 		//Count Items in a Tree Node
 		else if (!strcmp(command, "count")) {
+			printf("need to implement count\n");
 		}
 
 		//Delete Item
 		else if (!strcmp(command, "delete")) {
+			printf("need to implement delete\n");
 		}
 
 		//Delete Tree
 		else if (!strcmp(command, "delete_tree")) {
+			printf("need to implement delete_tree\n");
 		}
 	}
 }
