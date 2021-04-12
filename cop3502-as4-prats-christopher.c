@@ -38,6 +38,8 @@ int item_side_height(item_node *item); //Find the Height of a Specified Side
 int item_count(item_node *item); //Find the Item Count in a Tree
 item_node *delete_item(item_node *item, char name[]); //Delete an Item from a Tree
 item_node *smallest_item(item_node *item); //Find the Smallest Item in a Tree
+tree_name_node *delete_tree(tree_name_node *tree, char name[]); //Delete a Tree Name Node
+tree_name_node *smallest_tree(tree_name_node *tree); //Find the Smallest Tree
 
 // Constructor Prototypes
 item_node *create_item_node(char name[], int count); //Constructor for Item Node
@@ -45,7 +47,9 @@ tree_name_node *create_tree_name_node(char treeName[]); //Constructor for Tree N
 
 // Destructor Prototypes
 void dispose_item_node(item_node *del_item_node); //Destructor for Item Node
+void dispose_item_node_tree(item_node *delete_item_node); //Destructor for Item Node Tree
 void dispose_tree_name_node(tree_name_node *del_tree_name_node); //Destructor for Tree Name Node
+void dispose_tree_name_node_tree(tree_name_node *del_tree_name_node); //Destructor for Tree Name Node Tree
 
 // The Main Function
 int main() {
@@ -63,7 +67,9 @@ int main() {
 
 	//Execute Commands
 	execute_commands(ifp, ofp, tree, num_commands);
-	traverse_in_order(ofp, tree);
+
+	//Free the Tree
+	dispose_tree_name_node_tree(tree);
 
 	//Close the Input and Output Files Prior to Exit
 	fclose(ifp);
@@ -500,7 +506,8 @@ void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_comman
 
 		//Delete Tree
 		else if (!strcmp(command, "delete_tree")) {
-			printf("need to implement delete_tree\n");
+			delete_tree(tree, tree_name);
+			fprintf(ofp, "%s deleted\n", tree_name);
 		}
 	}
 }
@@ -672,6 +679,69 @@ item_node *smallest_item(item_node *item) {
 	return smallest_item_node;
 }
 
+// This Function Deletes a Tree Name Node
+tree_name_node *delete_tree(tree_name_node *tree, char name[]) {
+	//Only Perform Action if the Tree is Not Null
+	if (tree != NULL) {
+		//Compare Name with the Tree's Name
+		int comparison = strcmp(name, tree->treeName);
+
+		//If the Name is Greater than the Tree's Name, Set tree->right by Recursively Calling the Function
+		if (comparison > 0) {
+			tree->right = delete_tree(tree->right, name);
+		}
+
+		//If the Name is Smaller than the Tree's Name, Set tree->left by Recursively Calling the Function
+		else if (comparison < 0) {
+			tree->left = delete_tree(tree->left, name);
+		}
+
+		//If the Name Matches, Perform Deletion
+		else {
+			//Create Temporary Variables to Store Deleted Data
+			tree_name_node *temp_tree;
+
+			//Set the Return Value if there is No Left Child
+			if (tree->left == NULL) {
+				temp_tree = tree->right;
+				dispose_tree_name_node(tree);
+				tree = temp_tree;
+			}
+
+			//Set the Return Value if there is No Right Child
+			else if (tree->right == NULL) {
+				temp_tree = tree->left;
+				dispose_tree_name_node(tree);
+				tree = temp_tree;
+			}
+
+			//Both Children are Present
+			else {
+				temp_tree = smallest_tree(tree->right);
+				strcpy(tree->treeName, temp_tree->treeName);
+				tree->right = delete_tree(tree->right, temp_tree->treeName);
+			}
+		}
+	}
+
+	//Return the Current Tree
+	return tree;
+}
+
+// This Function Finds and Returns the Smallest Tree
+tree_name_node *smallest_tree(tree_name_node *tree) {
+	//Start from the Passed Item
+	tree_name_node *smallest_tree_node = tree;
+
+	//Traverse While There is a Tree to the Left
+	while (smallest_tree_node != NULL && smallest_tree_node->left != NULL) {
+		smallest_tree_node = smallest_tree_node->left;
+	}
+
+	//Return the Smallest Tree Node
+	return smallest_tree_node;
+}
+
 /*
  * This section includes the functions for constructing the various
  * objects used in this program
@@ -711,6 +781,41 @@ void dispose_item_node(item_node *del_item_node) {
 	free(del_item_node);
 }
 
+// This Function will Destroy a Item Node Tree that was Constructed
+void dispose_item_node_tree(item_node *delete_item_node) {
+	//Dispose the Left Children
+	if (delete_item_node->left != NULL) {
+		dispose_item_node_tree(delete_item_node->left);
+	}
+
+	//Dispose the Right Children
+	if (delete_item_node->right != NULL) {
+		dispose_item_node_tree(delete_item_node->right);
+	}
+
+	//Dispose the Current Item Node
+	dispose_item_node(delete_item_node);
+}
+
 // This Function will Destroy a Tree Name Node that was Constructed
 void dispose_tree_name_node(tree_name_node *del_tree_name_node) {
+	dispose_item_node_tree(del_tree_name_node->theTree);
+	free(del_tree_name_node);
 }
+
+// This Function will Destroy a Tree Name Node Tree that was Constructed
+void dispose_tree_name_node_tree(tree_name_node *del_tree_name_node) {
+	//Dispose Left Children
+	if (del_tree_name_node->left != NULL) {
+		dispose_tree_name_node_tree(del_tree_name_node->left);
+	}
+
+	//Dispose Right Children
+	if (del_tree_name_node->right != NULL) {
+		dispose_tree_name_node_tree(del_tree_name_node->right);
+	}
+
+	//Dispose the Current Item Node
+	dispose_tree_name_node(del_tree_name_node);
+}
+

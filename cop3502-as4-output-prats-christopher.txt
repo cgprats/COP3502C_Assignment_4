@@ -26,12 +26,4 @@ cat not found in animal
 animal count 112
 swordfish deleted from fish
 avocado deleted from fruit
-animal bird fish fruit 
-===animal===
-alligator bear cow deer dog horse lion tiger 
-===bird===
-blackbird crow dove flamingo 
-===fish===
-catfish garfish goldfish salmon 
-===fruit===
-apple apricot banana cherry coconut cranberry mango nectarine peach 
+animal deleted
