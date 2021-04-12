@@ -33,6 +33,7 @@ void print_tree_name_nodes(FILE *ofp, tree_name_node *tree); //Print Tree Name N
 void print_item_nodes(FILE *ofp, item_node *item); //Print Item Nodes
 void print_all_item_nodes(FILE *ofp, tree_name_node *tree); //Print All Item Nodes in a Tree
 void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_commands); //Execute Commands from a File
+int items_before_item_node(tree_name_node *tree, char treeName[], char itemNodeName[]); //Find Number of Items Before a Node
 
 // Constructor Prototypes
 item_node *create_item_node(char name[], int count); //Constructor for Item Node
@@ -310,6 +311,7 @@ item_node *search_in_name_node(tree_name_node *tree, char treeName[], char itemN
 		do {
 			//Compare the Strings
 			does_not_match = strcmp(currentNode->name, itemNodeName);
+
 			//If the Node Matches, set the Found Node
 			if (!does_not_match) {
 				foundNode = currentNode;
@@ -396,6 +398,7 @@ void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_comman
 	char buf[64], command[64], tree_name[32], item_name[32];
 	
 	//Run the Specified Number of Commands
+	fprintf(ofp, "=====Processing Commands=====\n");
 	for (int i = 0; i < num_commands; i++) {
 		//Read the Command
 		get_next_nonblank_line(ifp, buf, 63);
@@ -421,7 +424,7 @@ void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_comman
 
 		//Find Items Before
 		else if (!strcmp(command, "item_before")) {
-			printf("need to implement item_before\n");
+			fprintf(ofp, "item before %s: %d\n", item_name, items_before_item_node(tree, tree_name, item_name));
 		}
 
 		//Balance Tree Height
@@ -444,6 +447,59 @@ void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_comman
 			printf("need to implement delete_tree\n");
 		}
 	}
+}
+
+// This Command Finds the Number of Items Before Reaching an Item Node
+int items_before_item_node(tree_name_node *tree, char treeName[], char itemNodeName[]) {
+	//Create Initial Variables
+	int items_before = 0;
+	tree_name_node *currentTreeNode = tree;
+	item_node *currentItemNode = NULL;
+	int does_not_match;
+
+	//Search for Parent Tree
+	do {
+		//Compare the Strings
+		does_not_match = strcmp(currentTreeNode->treeName, treeName);
+
+		//If the Current Node is Larger than the Node We're Looking For, Check the Node to the Left
+		if (does_not_match > 0) {
+			currentTreeNode = currentTreeNode->left;
+		}
+
+		//If the Current Node is Smaller than the Node We're Looking For, Check the Node to the Right
+		else if (does_not_match < 0) {
+			currentTreeNode = currentTreeNode->right;
+		}
+
+		//Increase the Number of Items Before on Each Run
+		items_before++;
+	} while (does_not_match && currentTreeNode != NULL);
+
+	//Search for the Item Node
+	if (currentTreeNode != NULL) {
+		currentItemNode = currentTreeNode->theTree;
+		do {
+			//Compare the Strings
+			does_not_match = strcmp(currentItemNode->name, itemNodeName);
+
+			//If the Current Node is Larger than the Node We're Looking For, Check the Node to the Left
+			if (does_not_match > 0) {
+				currentItemNode = currentItemNode->left;
+				items_before++;
+			}
+
+			//If the Current Node is Smaller than the Node We're Lookdng For, Check the Node to the Right
+			else if (does_not_match < 0) {
+				currentItemNode = currentItemNode->right;
+				items_before++;
+			}
+		} while (does_not_match && currentItemNode != NULL);
+	}
+
+
+	//Return the Number of Items
+	return items_before;
 }
 
 /*
