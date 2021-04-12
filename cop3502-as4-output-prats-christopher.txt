@@ -15,5 +15,8 @@ tilapia not found in fish
 cow not found in bird
 30 cat found in animal
 item before deer: 4
-rose not found in flower
+animal: left height 1, right height 3, difference 2, not balanced
+bird: left height -1, right height 2, difference 3, not balanced
+fish: left height 1, right height 1, difference 0, balanced
+flower does not exist
 30 cat found in animal

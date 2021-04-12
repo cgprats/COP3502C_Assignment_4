@@ -34,6 +34,7 @@ void print_item_nodes(FILE *ofp, item_node *item); //Print Item Nodes
 void print_all_item_nodes(FILE *ofp, tree_name_node *tree); //Print All Item Nodes in a Tree
 void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_commands); //Execute Commands from a File
 int items_before_item_node(tree_name_node *tree, char treeName[], char itemNodeName[]); //Find Number of Items Before a Node
+int item_side_height(item_node *item); //Find the Height of a Specified Side
 
 // Constructor Prototypes
 item_node *create_item_node(char name[], int count); //Constructor for Item Node
@@ -409,16 +410,26 @@ void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_comman
 
 		//Perform Search
 		if (!strcmp(command, "search")) {
-			item_node *foundItem = search_in_name_node(tree, tree_name, item_name);
+			tree_name_node *foundTree = search_for_name_node(tree, tree_name);
 
-			//If the Item was Found, Print Its Information
-			if (foundItem != NULL) {
-				fprintf(ofp, "%d %s found in %s\n", foundItem->count, foundItem->name, tree_name);
+			//If the Parent Tree was Found, Search for the Item
+			if (foundTree != NULL) {
+				item_node *foundItem = search_in_name_node(tree, tree_name, item_name);
+				//If the Item Exists, Print its Information
+				if (foundItem != NULL) {
+					item_node *foundItem = search_in_name_node(tree, tree_name, item_name);
+					fprintf(ofp, "%d %s found in %s\n", foundItem->count, foundItem->name, tree_name);
+				}
+
+				//If the Item Does Not Exist, Print a Message
+				else {
+					fprintf(ofp, "%s not found in %s\n", item_name, tree_name);
+				}
 			}
 
-			//If the Item was Not Found, Print a Message
+			//If the Parent Tree Does Not Exist, Print a Message
 			else {
-				fprintf(ofp, "%s not found in %s\n", item_name, tree_name);
+				fprintf(ofp, "%s does not exist\n", tree_name);
 			}
 		}
 
@@ -429,7 +440,24 @@ void execute_commands(FILE *ifp, FILE *ofp, tree_name_node *tree, int num_comman
 
 		//Balance Tree Height
 		else if (!strcmp(command, "height_balance")) {
-			printf("need to implement height_balance\n");
+			tree_name_node *balance_tree = search_for_name_node(tree, tree_name);
+
+			//Only Perform Operation if the Tree Exists
+			if (balance_tree != NULL) {
+				int left_height = item_side_height(balance_tree->theTree->left);
+				int right_height = item_side_height(balance_tree->theTree->right);
+				int difference = right_height - left_height;
+
+				if (!difference) {
+					fprintf(ofp, "%s: left height %d, right height %d, difference %d, balanced\n",
+							tree_name, left_height, right_height, difference);
+				}
+
+				else {
+					fprintf(ofp, "%s: left height %d, right height %d, difference %d, not balanced\n",
+							tree_name, left_height, right_height, difference);
+				}
+			}
 		}
 
 		//Count Items in a Tree Node
@@ -500,6 +528,36 @@ int items_before_item_node(tree_name_node *tree, char treeName[], char itemNodeN
 
 	//Return the Number of Items
 	return items_before;
+}
+
+// This Function Finds and Returns the Height of a Specified Side of an Item Node Tree from a Tree Node Tree
+int item_side_height(item_node *item) {
+	//Create Initial Variables
+	int height = 0;
+
+	//If Item is NULL, Height is -1
+	if (item == NULL) {
+		height = -1;
+	}
+
+	//If Item is Not NULL, Increase the Height by 1 and Continue Traveling Down the Tree
+	else {
+		//Increase the Height by 1
+		height++;
+
+		//If the Item to the Right Exists, Recursively Call the Function on It
+		if (item->right != NULL) {
+			height += item_side_height(item->right);
+		}
+
+		//Otherwise, Recursively Call the Function on the Left
+		else {
+			height += item_side_height(item->left);
+		}
+	}
+	
+	//Return the Calculated Height
+	return height;
 }
 
 /*
