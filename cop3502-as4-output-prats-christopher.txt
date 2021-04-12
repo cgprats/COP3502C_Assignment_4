@@ -1,9 +1,9 @@
 animal bird fish fruit 
 ===animal===
-
+alligator bear cat cow deer dog horse lion tiger 
 ===bird===
-
+blackbird crow dove flamingo 
 ===fish===
 catfish garfish goldfish salmon swordfish 
 ===fruit===
-
+apple apricot avocado banana cherry coconut cranberry mango nectarine peach 

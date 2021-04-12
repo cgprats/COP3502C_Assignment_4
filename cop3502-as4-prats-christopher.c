@@ -262,22 +262,26 @@ tree_name_node *search_for_name_node(tree_name_node *tree, char treeName[]) {
 	tree_name_node *currentNode = tree;
 
 	//Search for the Node
+	int does_not_match;
 	do {
+		//Compare the Strings
+		does_not_match = strcmp(currentNode->treeName, treeName);
+
 		//If the Node Matches, set the Found Node
-		if (!strcmp(currentNode->treeName, treeName)) {
+		if (!does_not_match) {
 			foundNode = currentNode;
 		}
 
 		//If the Current Node is Larger than the Node We're Looking For, Check the Node to the Left
-		else if (strcmp(currentNode->treeName, treeName) > 0) {
+		else if (does_not_match > 0) {
 			currentNode = currentNode->left;
 		}
 
 		//If the Current Node is Smaller than the Node We're Looking For, Check the Node to the Right
-		else if (strcmp(currentNode->treeName, treeName) < 0) {
+		else if (does_not_match < 0) {
 			currentNode = currentNode->right;
 		}
-	} while (strcmp(currentNode->treeName, treeName) && currentNode != NULL);
+	} while (does_not_match && currentNode != NULL);
 
 	//Return the Found Node
 	return foundNode;
@@ -297,22 +301,25 @@ item_node *search_in_name_node(tree_name_node *tree, char treeName[], char itemN
 		item_node *currentNode = tree->theTree;
 
 		//Search for the Node
+		int does_not_match;
 		do {
+			//Compare the Strings
+			does_not_match = strcmp(currentNode->name, itemNodeName);
 			//If the Node Matches, set the Found Node
-			if (!strcmp(currentNode->name, itemNodeName)) {
+			if (!does_not_match) {
 				foundNode = currentNode;
 			}
 
 			//If the Current Node is Larger than the Node We're Looking For, Check the Node to the Left
-			else if (strcmp(currentNode->name, itemNodeName) > 0) {
+			else if (does_not_match > 0) {
 				currentNode = currentNode->left;
 			}
 
 			//If the Current Node is Smaller than the Node We're Lookdng For, Check the Node to the Right
-			else if (strcmp(currentNode->name, itemNodeName) < 0) {
+			else if (does_not_match < 0) {
 				currentNode = currentNode->right;
 			}
-		} while (strcmp(currentNode->name, itemNodeName) && currentNode != NULL);
+		} while (does_not_match && currentNode != NULL);
 	}
 
 	//Return the Found Node
