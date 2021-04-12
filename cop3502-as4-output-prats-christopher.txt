@@ -1,0 +1,9 @@
+animal bird fish fruit 
+===animal===
+
+===bird===
+
+===fish===
+catfish garfish goldfish salmon swordfish 
+===fruit===
+

@@ -28,10 +28,10 @@ void add_item_node_child(item_node *parent, item_node *child); //Add a Child to 
 void add_item_node_child_to_tree(tree_name_node *tree, item_node *child, char parent_tree[]); //Add a Child to a Item Node Tree with the Tree Node Tree
 tree_name_node *search_for_name_node(tree_name_node *tree, char treeName[]); //Search for a Tree Name Node
 item_node *search_in_name_node(tree_name_node *tree, char treeName[], char itemNodeName[]); //Search for an Item Node
-void traverse_in_order(tree_name_node *tree); //Print the Tree in Order
-void print_tree_name_nodes(tree_name_node *tree); //Print Tree Name Nodes
-void print_item_nodes(item_node *item); //Print Item Nodes
-void print_all_item_nodes(tree_name_node *tree); //Print All Item Nodes in a Tree
+void traverse_in_order(FILE *ofp, tree_name_node *tree); //Print the Tree in Order
+void print_tree_name_nodes(FILE *ofp, tree_name_node *tree); //Print Tree Name Nodes
+void print_item_nodes(FILE *ofp, item_node *item); //Print Item Nodes
+void print_all_item_nodes(FILE *ofp, tree_name_node *tree); //Print All Item Nodes in a Tree
 
 // Constructor Prototypes
 item_node *create_item_node(char name[], int count); //Constructor for Item Node
@@ -52,7 +52,7 @@ int main() {
 	initialize_tree(ifp, tree);
 
 	//Print the Tree
-	traverse_in_order(tree);
+	traverse_in_order(ofp, tree);
 
 	//Close the Input and Output Files Prior to Exit
 	fclose(ifp);
@@ -320,61 +320,61 @@ item_node *search_in_name_node(tree_name_node *tree, char treeName[], char itemN
 }
 
 // This Function Prints the Tree in Order
-void traverse_in_order(tree_name_node *tree) {
+void traverse_in_order(FILE *ofp, tree_name_node *tree) {
 	//Print the Tree Name Nodes
-	print_tree_name_nodes(tree);
-	printf("\n");
+	print_tree_name_nodes(ofp, tree);
+	fprintf(ofp, "\n");
 
 	//Print All Item Nodes
-	print_all_item_nodes(tree);
+	print_all_item_nodes(ofp, tree);
 }
 
 //This Function Prints the Tree Name Nodes
-void print_tree_name_nodes(tree_name_node *tree) {
+void print_tree_name_nodes(FILE *ofp, tree_name_node *tree) {
 	//Only Attempt to Print if the Tree Node Exists
 	if (tree != NULL) {
 		//Recursively Call the Function on the Left Node
-		print_tree_name_nodes(tree->left);
+		print_tree_name_nodes(ofp, tree->left);
 		
 		//Print the Current Tree Node
-		printf("%s ", tree->treeName);
+		fprintf(ofp, "%s ", tree->treeName);
 		
 		//Recursively Call the Function on the Right Node
-		print_tree_name_nodes(tree->right);
+		print_tree_name_nodes(ofp, tree->right);
 	}
 }
 
 // This Function Prints the Item Name Nodes
-void print_item_nodes(item_node *item) {
+void print_item_nodes(FILE *ofp, item_node *item) {
 	//Only Attempt to Print if the Item Node Exists
 	if (item != NULL) {
 		//Recursively Call the Function on the Left Node
-		print_item_nodes(item->left);
+		print_item_nodes(ofp, item->left);
 
 		//Print the Current Item Node
-		printf("%s ", item->name);
+		fprintf(ofp, "%s ", item->name);
 
 		//Recursively Call the Function on the Right Node
-		print_item_nodes(item->right);
+		print_item_nodes(ofp, item->right);
 	}
 }
 
 // This Function Prints All Item Nodes in a Tree
-void print_all_item_nodes(tree_name_node *tree) {
+void print_all_item_nodes(FILE *ofp, tree_name_node *tree) {
 	//Only Attempt to Print if the Tree Exists
 	if (tree != NULL) {
 		//Recursively Call the Function on the Left Node
-		print_all_item_nodes(tree->left);
+		print_all_item_nodes(ofp, tree->left);
 
 		//Print the Current Tree Name
-		printf("===%s===\n", tree->treeName);
+		fprintf(ofp, "===%s===\n", tree->treeName);
 
 		//Print All Member Item Nodes
-		print_item_nodes(tree->theTree);
-		printf("\n");
+		print_item_nodes(ofp,tree->theTree);
+		fprintf(ofp, "\n");
 
 		//Recursively Call the Function on the Right Node
-		print_all_item_nodes(tree->right);
+		print_all_item_nodes(ofp, tree->right);
 	}
 }
 
