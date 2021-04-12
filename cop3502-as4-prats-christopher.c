@@ -644,10 +644,11 @@ item_node *delete_item(item_node *item, char name[]) {
 				item = temp_item;
 			}
 
-			//There are Two or No Children Present
+			//Both Children are Present
 			else {
-				temp_item = smallest_item(item->left);
-				item = temp_item;
+				temp_item = smallest_item(item->right);
+				item->count = temp_item->count;
+				strcpy(item->name, temp_item->name);
 				item->right = delete_item(item->right, temp_item->name);
 			}
 		}
@@ -707,14 +708,7 @@ tree_name_node *create_tree_name_node(char treeName[]) {
 
 // This Function will Destroy a Item Node that was Constructed
 void dispose_item_node(item_node *del_item_node) {
-	if (del_item_node->left != NULL) {
-		dispose_item_node(del_item_node->left);
-	}
-	if (del_item_node->right != NULL) {
-		dispose_item_node(del_item_node->right);
-	}
 	free(del_item_node);
-	del_item_node = NULL;
 }
 
 // This Function will Destroy a Tree Name Node that was Constructed
