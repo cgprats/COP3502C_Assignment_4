@@ -163,6 +163,9 @@ void initialize_tree(FILE *ifp, tree_name_node *tree, int *num_commands) {
 
 		//If the Item is the Head of the Tree
 		if (i == 0) {
+			tree->left = NULL;
+			tree->right = NULL;
+			tree->theTree = NULL;
 			strcpy(tree->treeName, buf);
 		}
 
